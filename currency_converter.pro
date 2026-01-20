@@ -12,6 +12,7 @@ SOURCES += src/main.cpp \
     src/mainwindow.cpp
     
 HEADERS += src/mainwindow.h \
+    src/global_consts.h
 
 
 # Default rules for deployment.
