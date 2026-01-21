@@ -40,7 +40,7 @@ private:
 public:
     explicit MainWindow(QWidget *parent = nullptr);
 
-    void configureInterface();
+    void configureInterfaceAppearance();
     void configureInterfaceColorScheme();
     
     

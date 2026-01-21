@@ -36,51 +36,61 @@ void MainWindow::configureInterfaceColorScheme()
     // m_windowSign->setAutoFillBackground(true);
 }
 
-void MainWindow::configureInterface()
+void MainWindow::configureInterfaceAppearance()
 {
-    //Configure window main layout
-    m_mainLayout = new QVBoxLayout(this);
-    this->setLayout(m_mainLayout);
-    m_mainLayout->setContentsMargins(10, 5, 10, 20);
-
     //Configure window main UI elements:
     //App page sign
     m_windowSign = new QLabel(GlobalConstants::appName, this);
     m_windowSign->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
-    m_mainLayout->addSpacing(0);
-    m_mainLayout->addWidget(m_windowSign);
-
-    //Horizonal layout for main elements: line-editors, menu-s etc.
-    QHBoxLayout *interactiveUI_layout = new QHBoxLayout;
-    interactiveUI_layout->addSpacing(5);
-    interactiveUI_layout->setContentsMargins(20, 5, 20, 5);
-    m_mainLayout->addLayout(interactiveUI_layout);
-
+    
     //#1 Line editor
     m_lineEdit_1 = new QLineEdit(this);
-    m_lineEdit_1->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    interactiveUI_layout->addWidget(m_lineEdit_1);
+    // m_lineEdit_1->setContentsMargins(5, 5, 5, 5);
+    m_lineEdit_1->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
     //#1 Drop-down menu
     m_currencyMenu_1 = new QComboBox(this);
-    m_currencyMenu_1->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    interactiveUI_layout->addWidget(m_currencyMenu_1);
+    m_currencyMenu_1->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
     //Coversion button
-    m_convertButton = new QPushButton("Convert", this);
-    interactiveUI_layout->addWidget(m_convertButton);
-    
+    m_convertButton = new QPushButton(tr("Convert"), this);
+    m_convertButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
     //#2 Line editor
     m_lineEdit_2 = new QLineEdit(this);
-    m_lineEdit_2->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    interactiveUI_layout->addWidget(m_lineEdit_2);
+    m_lineEdit_2->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
     //#2 Drop-down menu
     m_currencyMenu_2 = new QComboBox(this);
-    m_currencyMenu_2->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    interactiveUI_layout->addWidget(m_currencyMenu_2);
+    m_currencyMenu_2->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
-    m_mainLayout->addSpacing(GlobalConstants::mainWindowSize.height()/2.5);
+    //Horizonal layout for main elements: line-editors, menu-s etc.
+    QHBoxLayout *interactiveUI_layout = new QHBoxLayout;
+    interactiveUI_layout->setContentsMargins(10, 5, 10, 5);
+
+    interactiveUI_layout->addStretch(0);
+    interactiveUI_layout->addWidget(m_lineEdit_1, 0, Qt::AlignLeft);
+    interactiveUI_layout->addSpacing(0);
+    interactiveUI_layout->addWidget(m_currencyMenu_1, 0, Qt::AlignLeft);
+    interactiveUI_layout->addSpacing(15);
+    interactiveUI_layout->addWidget(m_convertButton, 0, Qt::AlignHCenter);
+    interactiveUI_layout->addSpacing(15);
+    interactiveUI_layout->addWidget(m_lineEdit_2, 0, Qt::AlignRight);
+    interactiveUI_layout->addSpacing(0);
+    interactiveUI_layout->addWidget(m_currencyMenu_2, 0, Qt::AlignRight);
+    interactiveUI_layout->addStretch(0);
+
+    //Configure window main layout
+    m_mainLayout = new QVBoxLayout(this);
+    this->setLayout(m_mainLayout);
+    
+    m_mainLayout->addSpacing(10);
+    m_mainLayout->addStretch(1);
+    m_mainLayout->addWidget(m_windowSign);
+    m_mainLayout->addSpacing(5);
+    m_mainLayout->addLayout(interactiveUI_layout);
+    m_mainLayout->addStretch(2);
+    m_mainLayout->addSpacing(GlobalConstants::mainWindowSize.height() / 2.5);
     
     //set debug info
     m_mainLayout->setObjectName("Main Window Layout");
@@ -89,19 +99,17 @@ void MainWindow::configureInterface()
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
 {
+    //Configure main window parms
     this->setWindowTitle(GlobalConstants::appName);
-    //does not demonstrate any effect
+    //does not demonstrate any effect?
     this->setFixedSize(GlobalConstants::mainWindowSize);
     this->setMinimumSize(GlobalConstants::mainWindowSize);
     this->setMaximumSize(GlobalConstants::mainWindowSize);
     this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     
-    
     this->setWindowFlags(windowFlags() & ~Qt::WindowMaximizeButtonHint);
-    configureInterface();
+    configureInterfaceAppearance();
     configureInterfaceColorScheme();
-    
-    setWindowFlags(Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     
     //set debug info
     this->setObjectName("App Main Window");
