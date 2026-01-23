@@ -1,67 +1,88 @@
 #include "mainwindow.h"
 
-void MainWindow::configureInterfaceColorScheme()
+void MainWindow::configureInterfaceStyle()
 {
-    // //temp local variable to describe and use shades of base colors
-    // QColor tempColor;
-    // //Set window background color
-    // QPalette windowPalette;
-    // QLinearGradient backgroundColorGradient(QPointF(0.0, 0.0),
-    //                                         QPointF(GlobalConstants::mainWindowSize.width(),
-    //                                                 GlobalConstants::mainWindowSize.height()));
-    // backgroundColorGradient.setColorAt(0.0,
-    //                                    GlobalConstants::colors[GlobalConstants::Colors::DARK_GREEN]);
-    // tempColor = GlobalConstants::colors[GlobalConstants::Colors::DARK_GREEN];
-    // tempColor.setRed(tempColor.red() * 0.50);
-    // tempColor.setGreen(tempColor.green() * 0.50);
-    // tempColor.setBlue(tempColor.blue() * 0.50);
-    // backgroundColorGradient.setColorAt(1.0, tempColor);
-    // backgroundColorGradient.setCoordinateMode(QGradient::CoordinateMode::LogicalMode);
-
-    // windowPalette.setBrush(QPalette::ColorRole::Window, QBrush(backgroundColorGradient));
-
-    // this->setPalette(windowPalette);
-
-    // //Configure window UI elements:
-    // //App page sign
-    // QPalette windowSignPalette;
-    // windowPalette.setColor(QPalette::Base, GlobalConstants::colors[GlobalConstants::Colors::OLIVE]);
-    // windowPalette.setColor(QPalette::WindowText,
-    //                        GlobalConstants::colors[GlobalConstants::Colors::DARK_GREEN]);
-    // windowPalette.setColor(QPalette::Text,
-    //                        GlobalConstants::colors[GlobalConstants::Colors::DARK_GREEN]);
-
-    // m_windowSign->setPalette(windowSignPalette);
-    // m_windowSign->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
-    // m_windowSign->setAutoFillBackground(true);
+    QFile styleFile(":/resources/ui_style.css");
+    if (!styleFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "Style file CANNOT be read!";
+        return;
+    } else {
+        QTextStream in(&styleFile);
+        this->setStyleSheet(in.readAll());
+    }
 }
 
-void MainWindow::configureInterfaceAppearance()
+void MainWindow::configureInterfaceFunctionality()
+{
+    const double maxEnterValue = 10.0;
+    QDoubleValidator *validator = new QDoubleValidator(this);
+    validator->setRange(0.0, maxEnterValue, 6);
+    
+    m_lineEdit_1->setValidator(validator);
+
+    m_lineEdit_2->setValidator(validator);
+    m_lineEdit_2->setReadOnly(true);
+
+    QStringList currencies = {"RUB Russian Ruble",
+                              "USD US Dollar",
+                              "EUR Euro",
+                              "CHF Swiss Franc",
+                              "GBP Pound Sterling",
+                              "JOD Jordanian Dinar",
+                              "JPY Japanese Yen",
+                              "PLN Polish Zloty",
+                              "SEK Swedish Krona",
+                              "TRY Turkish Lira"};
+    currencies.sort();
+    QStringList country_icons
+        = {"RUB", "USD", "EUR", "CHF", "GBP", "JOD", "JPY", "PLN", "SEK", "TRY"};
+    country_icons.sort();
+
+    m_currencyMenu_1->setItemDelegate(new DropMenuDelegate(m_currencyMenu_1));
+    m_currencyMenu_2->setItemDelegate(new DropMenuDelegate(m_currencyMenu_2));
+    for (QStringList::iterator currency_iter = currencies.begin(),
+                               icon_iter = country_icons.begin();
+         currency_iter != currencies.end();
+         ++currency_iter, ++icon_iter) {
+        
+        m_currencyMenu_1->addItem(QIcon(":"+*icon_iter), *currency_iter);
+        m_currencyMenu_2->addItem(QIcon(":"+*icon_iter), *currency_iter);
+    }
+}
+
+void MainWindow::configureInterfaceStructure()
 {
     //Configure window main UI elements:
     //App page sign
     m_windowSign = new QLabel(GlobalConstants::appName, this);
+    m_windowSign->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    m_windowSign->setObjectName("windowSign");
     m_windowSign->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
-    
+
     //#1 Line editor
-    m_lineEdit_1 = new QLineEdit(this);
-    // m_lineEdit_1->setContentsMargins(5, 5, 5, 5);
+    m_lineEdit_1 = new QLineEdit(m_lineEdit_1);
+    m_lineEdit_1->setObjectName("lineEdit_1");
     m_lineEdit_1->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
     //#1 Drop-down menu
     m_currencyMenu_1 = new QComboBox(this);
+    m_currencyMenu_1->setObjectName("currencyMenu_1");
     m_currencyMenu_1->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    m_currencyMenu_1->view()->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
     //Coversion button
-    m_convertButton = new QPushButton(tr("Convert"), this);
+    m_convertButton = new QPushButton(this);
+    m_convertButton->setObjectName("conversionButton");
     m_convertButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
     //#2 Line editor
     m_lineEdit_2 = new QLineEdit(this);
+    m_lineEdit_2->setObjectName("lineEdit_2");
     m_lineEdit_2->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
     //#2 Drop-down menu
     m_currencyMenu_2 = new QComboBox(this);
+    m_currencyMenu_2->setObjectName("currencyMenu_2");
     m_currencyMenu_2->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
     //Horizonal layout for main elements: line-editors, menu-s etc.
@@ -70,49 +91,47 @@ void MainWindow::configureInterfaceAppearance()
 
     interactiveUI_layout->addStretch(0);
     interactiveUI_layout->addWidget(m_lineEdit_1, 0, Qt::AlignLeft);
-    interactiveUI_layout->addSpacing(0);
+    interactiveUI_layout->addSpacing(-5);
     interactiveUI_layout->addWidget(m_currencyMenu_1, 0, Qt::AlignLeft);
     interactiveUI_layout->addSpacing(15);
     interactiveUI_layout->addWidget(m_convertButton, 0, Qt::AlignHCenter);
     interactiveUI_layout->addSpacing(15);
     interactiveUI_layout->addWidget(m_lineEdit_2, 0, Qt::AlignRight);
-    interactiveUI_layout->addSpacing(0);
+    interactiveUI_layout->addSpacing(-5);
     interactiveUI_layout->addWidget(m_currencyMenu_2, 0, Qt::AlignRight);
     interactiveUI_layout->addStretch(0);
 
     //Configure window main layout
     m_mainLayout = new QVBoxLayout(this);
     this->setLayout(m_mainLayout);
-    
-    m_mainLayout->addSpacing(10);
-    m_mainLayout->addStretch(1);
+
+    m_mainLayout->addStretch(0);
     m_mainLayout->addWidget(m_windowSign);
-    m_mainLayout->addSpacing(5);
+    m_mainLayout->addStretch(0);
     m_mainLayout->addLayout(interactiveUI_layout);
-    m_mainLayout->addStretch(2);
-    m_mainLayout->addSpacing(GlobalConstants::mainWindowSize.height() / 2.5);
+    m_mainLayout->addStretch(2);  
+    m_mainLayout->addSpacing(GlobalConstants::mainWindowSize.height() / 5);
     
     //set debug info
-    m_mainLayout->setObjectName("Main Window Layout");
+    m_mainLayout->setObjectName("mainWindowLayout");
 }
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
 {
-    //Configure main window parms
     this->setWindowTitle(GlobalConstants::appName);
-    //does not demonstrate any effect?
-    this->setFixedSize(GlobalConstants::mainWindowSize);
-    this->setMinimumSize(GlobalConstants::mainWindowSize);
-    this->setMaximumSize(GlobalConstants::mainWindowSize);
-    this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     
-    this->setWindowFlags(windowFlags() & ~Qt::WindowMaximizeButtonHint);
-    configureInterfaceAppearance();
-    configureInterfaceColorScheme();
+    configureInterfaceStructure();
+    
+    configureInterfaceStyle();
+    
+    configureInterfaceFunctionality();
     
     //set debug info
-    this->setObjectName("App Main Window");
+    this->setObjectName("mainWindow");
 }
 
-MainWindow::~MainWindow() {}
+MainWindow::~MainWindow()
+{
+    
+}

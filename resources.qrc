@@ -1,0 +1,17 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resources/ui_style.css</file>
+        <file alias="USD">resources/country_icons/USD_US_Dollar.png</file>
+        <file alias="TRY">resources/country_icons/TRY_Turkish_Lira.png</file>
+        <file alias="SEK">resources/country_icons/SEK_Swedish_Krona.png</file>
+        <file alias="RUB">resources/country_icons/RUS_Russian_Ruble.png</file>
+        <file alias="PLN">resources/country_icons/PLN_Polish_Zloty.png</file>
+        <file alias="JPY">resources/country_icons/JPY_Japanese_Yen.png</file>
+        <file alias="JOD">resources/country_icons/JOD_Jordanian_Dinar.png</file>
+        <file alias="GBP">resources/country_icons/GBP_Pound_Sterling.png</file>
+        <file alias="EUR">resources/country_icons/EUR_Euro.png</file>
+        <file alias="CHF">resources/country_icons/CHF_Swiss_Franc.png</file>
+        <file>resources/widget_icons/drop_down_icon.png</file>
+        <file>resources/widget_icons/arrows_icon.png</file>
+    </qresource>
+</RCC>

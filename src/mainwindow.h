@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "global_consts.h"
+#include "dropMenuDelegate.h"
 
 #include <QMainWindow>
 
@@ -10,15 +11,17 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QLineEdit>
-#include <QValidator>
+#include <QDoubleValidator>
 #include <QComboBox>
 
 #include <QPixmap>
 #include <QIcon>
-#include <QGradient>
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+
+#include <QFile>
+#include <QAbstractItemView>
 
 class MainWindow : public QWidget
 {
@@ -39,12 +42,16 @@ private:
     
 public:
     explicit MainWindow(QWidget *parent = nullptr);
-
-    void configureInterfaceAppearance();
-    void configureInterfaceColorScheme();
-    
     
     ~MainWindow();
+    
+private:
+    void configureInterfaceStructure();
+    void configureInterfaceStyle();
+    void configureInterfaceFunctionality();
+    
+private slots:
+        
 };
 
 

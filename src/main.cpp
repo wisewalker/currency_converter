@@ -2,17 +2,16 @@
 #include "global_consts.h"
 
 #include <QApplication>
-
+#include <QString>
+#include <QRegularExpression>
 
 namespace GlobalConstants {
+//App UI global parms
+const QString appName("Currency Convertor");
 const QSize mainWindowSize(480, 220);
-const QString apiURL("*type URL here*");
-const QString appName("Currency Calculator");
-const QMap<Colors, QColor> colors = {{Colors::GREY, QColor("#EDF4F2")},
-                                     {Colors::OLIVE, QColor("#7C8363")},
-                                     {Colors::DARK_GREEN, QColor("#31473A")}};
+//API related parms
+const QString apiURL("https://api.exchangerate-api.com/v4/latest/usd");
 }
-
 
 int main(int argc, char *argv[])
 {
@@ -20,6 +19,6 @@ int main(int argc, char *argv[])
 
     MainWindow window;
     window.show();
-    
+  
     return app.exec();
-}
+}   
