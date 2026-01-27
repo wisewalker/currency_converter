@@ -3,6 +3,7 @@
 
 #include "global_consts.h"
 #include "dropMenuDelegate.h"
+#include "apicommunicator.h"
 
 #include <QMainWindow>
 
@@ -14,7 +15,6 @@
 #include <QDoubleValidator>
 #include <QComboBox>
 
-#include <QPixmap>
 #include <QIcon>
 
 #include <QVBoxLayout>
@@ -22,6 +22,8 @@
 
 #include <QFile>
 #include <QAbstractItemView>
+
+class APICommunicator;
 
 class MainWindow : public QWidget
 {
@@ -39,6 +41,8 @@ private:
     QPushButton *m_convertButton = nullptr;
     QLineEdit *m_lineEdit_2 = nullptr;
     QComboBox *m_currencyMenu_2 = nullptr;
+
+    APICommunicator *m_apiCommunicator = nullptr;
     
 public:
     explicit MainWindow(QWidget *parent = nullptr);
@@ -51,7 +55,7 @@ private:
     void configureInterfaceFunctionality();
     
 private slots:
-        
+    void initConfiguration();
 };
 
 

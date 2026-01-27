@@ -22,31 +22,19 @@ void MainWindow::configureInterfaceFunctionality()
 
     m_lineEdit_2->setValidator(validator);
     m_lineEdit_2->setReadOnly(true);
-
-    QStringList currencies = {"RUB Russian Ruble",
-                              "USD US Dollar",
-                              "EUR Euro",
-                              "CHF Swiss Franc",
-                              "GBP Pound Sterling",
-                              "JOD Jordanian Dinar",
-                              "JPY Japanese Yen",
-                              "PLN Polish Zloty",
-                              "SEK Swedish Krona",
-                              "TRY Turkish Lira"};
+    
+    QStringList currencies = m_apiCommunicator->currencyNames();
     currencies.sort();
-    QStringList country_icons
-        = {"RUB", "USD", "EUR", "CHF", "GBP", "JOD", "JPY", "PLN", "SEK", "TRY"};
-    country_icons.sort();
-
+    
     m_currencyMenu_1->setItemDelegate(new DropMenuDelegate(m_currencyMenu_1));
     m_currencyMenu_2->setItemDelegate(new DropMenuDelegate(m_currencyMenu_2));
-    for (QStringList::iterator currency_iter = currencies.begin(),
-                               icon_iter = country_icons.begin();
+
+    for (QStringList::iterator currency_iter = currencies.begin();
          currency_iter != currencies.end();
-         ++currency_iter, ++icon_iter) {
+         ++currency_iter) {
         
-        m_currencyMenu_1->addItem(QIcon(":"+*icon_iter), *currency_iter);
-        m_currencyMenu_2->addItem(QIcon(":"+*icon_iter), *currency_iter);
+        m_currencyMenu_1->addItem(QIcon(":"+*currency_iter), *currency_iter);
+        m_currencyMenu_2->addItem(QIcon(":"+*currency_iter), *currency_iter);
     }
 }
 
@@ -116,19 +104,30 @@ void MainWindow::configureInterfaceStructure()
     m_mainLayout->setObjectName("mainWindowLayout");
 }
 
+void MainWindow::initConfiguration()
+{
+    configureInterfaceFunctionality();
+    show();
+}
+
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
 {
     this->setWindowTitle(GlobalConstants::appName);
+    this->setObjectName("mainWindow");
+    this->setMinimumSize(GlobalConstants::mainWindowSize);
     
     configureInterfaceStructure();
-    
     configureInterfaceStyle();
     
-    configureInterfaceFunctionality();
+    m_apiCommunicator = new APICommunicator(this);
     
-    //set debug info
-    this->setObjectName("mainWindow");
+    QObject::connect(m_apiCommunicator,
+                     &APICommunicator::allRequestsFinished,
+                     this,
+                     &MainWindow::initConfiguration);
+    
+    this->hide();
 }
 
 MainWindow::~MainWindow()
