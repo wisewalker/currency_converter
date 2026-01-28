@@ -11,12 +11,14 @@ CONFIG += c++17
 SOURCES += src/main.cpp \
     src/apicommunicator.cpp \
     src/dropMenuDelegate.cpp \
+    src/inputValidator.cpp \
     src/mainwindow.cpp \
     
 HEADERS += src/mainwindow.h \
     src/apicommunicator.h \
     src/dropMenuDelegate.h \
-    src/global_consts.h
+    src/global_consts.h \
+    src/inputValidator.h
 
 
 # Default rules for deployment.

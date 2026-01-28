@@ -2,7 +2,9 @@
 
 DropMenuDelegate::DropMenuDelegate(QObject *parent)
     : QStyledItemDelegate(parent)
-{}
+{
+    
+}
 
 void DropMenuDelegate::paint(QPainter *painter,
                              const QStyleOptionViewItem &option,

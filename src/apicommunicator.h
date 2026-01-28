@@ -2,7 +2,6 @@
 #define APICOMMUNICATOR_H
 
 #include "global_consts.h"
-#include "mainwindow.h"
 
 #include <QObject>
 

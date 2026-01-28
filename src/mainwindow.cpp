@@ -14,21 +14,38 @@ void MainWindow::configureInterfaceStyle()
 
 void MainWindow::configureInterfaceFunctionality()
 {
-    const double maxEnterValue = 10.0;
-    QDoubleValidator *validator = new QDoubleValidator(this);
-    validator->setRange(0.0, maxEnterValue, 6);
+    //Configure line-editors
+    InputValidator *validator = new InputValidator(this);
+    validator->setRange(0.0, maxEnterValue, maxDigitsAfterDot);
     
     m_lineEdit_1->setValidator(validator);
-
-    m_lineEdit_2->setValidator(validator);
-    m_lineEdit_2->setReadOnly(true);
+    QObject::connect(m_lineEdit_1,
+                     &QLineEdit::textChanged,
+                     this,
+                     &MainWindow::onEntryFieldChanged);
     
+    m_lineEdit_2->setValidator(validator);
+    QObject::connect(m_lineEdit_2,
+                     &QLineEdit::textChanged,
+                     this,
+                     &MainWindow::onEntryFieldChanged);
+    
+    //Configure drop-down menus
     QStringList currencies = m_apiCommunicator->currencyNames();
     currencies.sort();
     
     m_currencyMenu_1->setItemDelegate(new DropMenuDelegate(m_currencyMenu_1));
+    QObject::connect(m_currencyMenu_1,
+                     qOverload<int>(&QComboBox::currentIndexChanged),
+                     this,
+                     &MainWindow::onCurrencyMenuOptionChanged);
+    
     m_currencyMenu_2->setItemDelegate(new DropMenuDelegate(m_currencyMenu_2));
-
+    QObject::connect(m_currencyMenu_2,
+                     qOverload<int>(&QComboBox::currentIndexChanged),
+                     this,
+                     &MainWindow::onCurrencyMenuOptionChanged);
+    
     for (QStringList::iterator currency_iter = currencies.begin();
          currency_iter != currencies.end();
          ++currency_iter) {
@@ -36,6 +53,21 @@ void MainWindow::configureInterfaceFunctionality()
         m_currencyMenu_1->addItem(QIcon(":"+*currency_iter), *currency_iter);
         m_currencyMenu_2->addItem(QIcon(":"+*currency_iter), *currency_iter);
     }
+
+    //Configure exchange-currencies button
+    QObject::connect(m_exchangeCurrenciesButton,
+                     &QPushButton::clicked,
+                     this,
+                     &MainWindow::onExchangeCurrencies);
+    
+    
+    //Set default currencies
+    m_currencyMenu_1->setCurrentIndex(currencies.indexOf("USD"));
+    m_currencyMenu_2->setCurrentIndex(currencies.indexOf("RUB"));
+    
+    //Set default entered values
+    m_lineEdit_1->setText("0.0");
+    m_lineEdit_2->setText("0.0");
 }
 
 void MainWindow::configureInterfaceStructure()
@@ -59,9 +91,9 @@ void MainWindow::configureInterfaceStructure()
     m_currencyMenu_1->view()->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
     //Coversion button
-    m_convertButton = new QPushButton(this);
-    m_convertButton->setObjectName("conversionButton");
-    m_convertButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    m_exchangeCurrenciesButton = new QPushButton(this);
+    m_exchangeCurrenciesButton->setObjectName("conversionButton");
+    m_exchangeCurrenciesButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
     //#2 Line editor
     m_lineEdit_2 = new QLineEdit(this);
@@ -82,7 +114,7 @@ void MainWindow::configureInterfaceStructure()
     interactiveUI_layout->addSpacing(-5);
     interactiveUI_layout->addWidget(m_currencyMenu_1, 0, Qt::AlignLeft);
     interactiveUI_layout->addSpacing(15);
-    interactiveUI_layout->addWidget(m_convertButton, 0, Qt::AlignHCenter);
+    interactiveUI_layout->addWidget(m_exchangeCurrenciesButton, 0, Qt::AlignHCenter);
     interactiveUI_layout->addSpacing(15);
     interactiveUI_layout->addWidget(m_lineEdit_2, 0, Qt::AlignRight);
     interactiveUI_layout->addSpacing(-5);
@@ -106,8 +138,63 @@ void MainWindow::configureInterfaceStructure()
 
 void MainWindow::initConfiguration()
 {
+    configureInterfaceStructure();
+    configureInterfaceStyle();    
     configureInterfaceFunctionality();
-    show();
+    this->show();
+}
+
+QString MainWindow::calculateCurrencyResultValue(const QString &enteredValue,
+                                                 const QString &fromCurrancy,
+                                                 const QString &toCurrancy)
+{
+    qreal currencyValue = m_apiCommunicator->currencyData()[fromCurrancy][toCurrancy];
+
+    return QString::number(enteredValue.toDouble() * currencyValue, 'f', this->maxDigitsAfterDot);
+}
+
+void MainWindow::onEntryFieldChanged(const QString &text)
+{
+    if (this->sender() == m_lineEdit_1) {
+        m_lineEdit_2->blockSignals(true);
+
+        m_lineEdit_2->setText(calculateCurrencyResultValue(text,
+                                                           m_currencyMenu_1->currentText(),
+                                                           m_currencyMenu_2->currentText()));
+
+        m_lineEdit_2->blockSignals(false);
+    } else {
+        m_lineEdit_1->blockSignals(true);
+
+        m_lineEdit_1->setText(calculateCurrencyResultValue(text,
+                                                           m_currencyMenu_2->currentText(),
+                                                           m_currencyMenu_1->currentText()));
+
+        m_lineEdit_1->blockSignals(false);
+    }
+}
+
+void MainWindow::onCurrencyMenuOptionChanged(int)
+{
+    m_lineEdit_2->blockSignals(true);
+
+    m_lineEdit_2->setText(calculateCurrencyResultValue(m_lineEdit_1->text(),
+                                                       m_currencyMenu_1->currentText(),
+                                                       m_currencyMenu_2->currentText()));
+
+    m_lineEdit_2->blockSignals(false);
+}
+
+void MainWindow::onExchangeCurrencies(bool)
+{
+    int tempMenuOption = -1;
+    tempMenuOption = m_currencyMenu_1->currentIndex();
+    
+    //avoid extra calculations
+    m_lineEdit_1->blockSignals(true);
+    m_currencyMenu_1->setCurrentIndex(m_currencyMenu_2->currentIndex());
+    m_lineEdit_1->blockSignals(false);
+    m_currencyMenu_2->setCurrentIndex(tempMenuOption);
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -115,13 +202,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     this->setWindowTitle(GlobalConstants::appName);
     this->setObjectName("mainWindow");
-    this->setMinimumSize(GlobalConstants::mainWindowSize);
-    
-    configureInterfaceStructure();
-    configureInterfaceStyle();
     
     m_apiCommunicator = new APICommunicator(this);
-    
     QObject::connect(m_apiCommunicator,
                      &APICommunicator::allRequestsFinished,
                      this,

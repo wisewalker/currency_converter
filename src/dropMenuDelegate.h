@@ -2,6 +2,7 @@
 #define DROPMENUDELEGATE_H
 
 #include <QStyledItemDelegate>
+
 #include <QPainter>
 #include <QApplication>
 #include <QTextDocument>
