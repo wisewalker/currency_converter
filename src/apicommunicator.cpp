@@ -10,11 +10,6 @@ APICommunicator::APICommunicator(QObject *parent)
                      &QNetworkAccessManager::finished,
                      this,
                      &APICommunicator::onAPI_RequestFinished);
-
-    for (const auto &currency : m_currencyNames) {
-        makeRequest(currency);
-        m_pendingRequests.insert("Request - " + currency);
-    }
 }
 
 void APICommunicator::makeRequest(const QString &currency)
@@ -33,6 +28,24 @@ void APICommunicator::printCurrencyData()
             qDebug() << "To " << toCurrency << ": " << m_currencies[fromCurrency][toCurrency];
         }
     } 
+}
+
+void APICommunicator::updateCurrencyData(const QString &currencyName)
+{
+    //qDebug() << m_currencies;
+    if (!m_currencyNames.contains(currencyName)) {
+        qDebug() << "The entered currency\'" << currencyName << "\' does not exist!";
+        return;
+    }
+    else if(m_currencies.contains(currencyName))
+    {
+        qDebug() << "The entered currency\'" << currencyName << "\' is up to date, nothing to update for now!";
+        return;
+    }
+    else{
+        qDebug() << "The entered currency\'" << currencyName << "\' was requested to be updated!";
+        makeRequest(currencyName);
+    }
 }
 
 const QMap<QString, QMap<QString, qreal>> &APICommunicator::currencyData() const
@@ -76,15 +89,8 @@ void APICommunicator::onAPI_RequestFinished(QNetworkReply *reply)
         for (const auto &currencyName : m_currencyNames) {
             m_currencies[baseCode][currencyName] = currency_values[currencyName].toDouble();
         }
-        
-        //Add this check-construction in order to prevent any actions (like, printing currency data)
-        //before we conduct all requests and process according data
-        m_pendingRequests.remove("Request - " + baseCode);
-        
-        if(m_pendingRequests.isEmpty())
-        {
-            emit allRequestsFinished();
-        }
+
+        emit currencyDataUpdated(baseCode);
     }
     else
     {

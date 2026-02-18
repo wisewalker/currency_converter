@@ -28,15 +28,15 @@ private:
     const QStringList m_currencyNames
         = {"RUB", "USD", "EUR", "CHF", "GBP", "JOD", "JPY", "PLN", "SEK", "TRY"};
     QMap<QString, QMap<QString, qreal>> m_currencies;
-    
-    QSet<QString> m_pendingRequests;
-    
+
 public:
     explicit APICommunicator(QObject *parent = nullptr);
 
     void printCurrencyData();
 
     const QMap<QString, QMap<QString, qreal>> &currencyData() const;
+
+    void updateCurrencyData(const QString &currencyName);
 
     const QStringList &currencyNames() const;
     
@@ -49,7 +49,7 @@ private slots:
     void onAPI_RequestFinished(QNetworkReply* reply);
     
 signals:
-    void allRequestsFinished();
+    void currencyDataUpdated(const QString &currencyName);
 };
 
 #endif // APICOMMUNICATOR_H

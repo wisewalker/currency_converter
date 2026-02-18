@@ -37,7 +37,8 @@ private:
     //Interface constants
     const double maxEnterValue = 1'000'000'000.0;
     const int maxDigitsAfterDot = 2;
-    
+
+    bool configurationFinished = false;
     appliedLayout_t *m_mainLayout = nullptr;
     QLabel *m_windowSign = nullptr;
 
@@ -47,6 +48,7 @@ private:
     QLineEdit *m_lineEdit_2 = nullptr;
     QComboBox *m_currencyMenu_2 = nullptr;
 
+    QStringList m_defaultCurrencies{"USD", "RUB"};
     APICommunicator *m_apiCommunicator = nullptr;
         
 public:
@@ -61,6 +63,7 @@ private:
     QString calculateCurrencyResultValue(const QString &enteredValue,
                                        const QString &fromCurrancy,
                                        const QString &toCurrancy);
+    void requestCurrencyUpdate(const QString &currencyName);
     
 private slots:
     void initConfiguration();

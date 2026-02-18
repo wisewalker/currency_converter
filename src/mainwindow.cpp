@@ -59,11 +59,10 @@ void MainWindow::configureInterfaceFunctionality()
                      &QPushButton::clicked,
                      this,
                      &MainWindow::onExchangeCurrencies);
-    
-    
+
     //Set default currencies
-    m_currencyMenu_1->setCurrentIndex(currencies.indexOf("USD"));
-    m_currencyMenu_2->setCurrentIndex(currencies.indexOf("RUB"));
+    m_currencyMenu_1->setCurrentIndex(currencies.indexOf(m_defaultCurrencies[0]));
+    m_currencyMenu_2->setCurrentIndex(currencies.indexOf(m_defaultCurrencies[1]));
     
     //Set default entered values
     m_lineEdit_1->setText("0.0");
@@ -141,7 +140,11 @@ void MainWindow::initConfiguration()
     configureInterfaceStructure();
     configureInterfaceStyle();    
     configureInterfaceFunctionality();
+    
+    this->hide();
     this->show();
+
+    configurationFinished = true;
 }
 
 QString MainWindow::calculateCurrencyResultValue(const QString &enteredValue,
@@ -176,12 +179,13 @@ void MainWindow::onEntryFieldChanged(const QString &text)
 
 void MainWindow::onCurrencyMenuOptionChanged(int)
 {
+    if (configurationFinished) {
+        m_apiCommunicator->updateCurrencyData(qobject_cast<QComboBox *>(sender())->currentText());
+    }
     m_lineEdit_2->blockSignals(true);
-
     m_lineEdit_2->setText(calculateCurrencyResultValue(m_lineEdit_1->text(),
                                                        m_currencyMenu_1->currentText(),
                                                        m_currencyMenu_2->currentText()));
-
     m_lineEdit_2->blockSignals(false);
 }
 
@@ -204,12 +208,11 @@ MainWindow::MainWindow(QWidget *parent)
     this->setObjectName("mainWindow");
     
     m_apiCommunicator = new APICommunicator(this);
-    QObject::connect(m_apiCommunicator,
-                     &APICommunicator::allRequestsFinished,
-                     this,
-                     &MainWindow::initConfiguration);
+
+    m_apiCommunicator->updateCurrencyData(m_defaultCurrencies[0]);
+    m_apiCommunicator->updateCurrencyData(m_defaultCurrencies[1]);
     
-    this->hide();
+    initConfiguration();
 }
 
 MainWindow::~MainWindow()
