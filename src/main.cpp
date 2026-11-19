@@ -9,7 +9,7 @@ namespace GlobalConstants {
 const QString appName("Currency Convertor");
 const QSize mainWindowSize(480, 220);
 //API related parms
-const QString apiURL("*type your API URL*");
+const QString apiURL(" ");
 }
 
 int main(int argc, char *argv[])
@@ -17,6 +17,9 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     MainWindow window;
+    window.show();
+
     
+
     return app.exec();
 }   
